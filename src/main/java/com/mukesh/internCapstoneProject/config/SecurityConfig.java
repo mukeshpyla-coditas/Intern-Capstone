@@ -1,5 +1,6 @@
 package com.mukesh.internCapstoneProject.config;
 
+import com.mukesh.internCapstoneProject.enums.Roles;
 import com.mukesh.internCapstoneProject.filter.JwtFilter;
 import com.mukesh.internCapstoneProject.service.implementations.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtFilter jwtFilter) {
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+        httpSecurity.authorizeHttpRequests(http ->
+                http.requestMatchers("/api/v1/users/register/hr", "/api/v1/users/login").permitAll()
+                        .requestMatchers("/api/v1/users/invite/**").hasRole(Roles.HR.name())
+        );
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         httpSecurity.httpBasic(Customizer.withDefaults());
         return httpSecurity.build();

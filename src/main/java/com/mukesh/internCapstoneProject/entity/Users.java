@@ -60,7 +60,7 @@ public class Users implements UserDetails {
     private String contactNumber;
 
     @Column(name = "is_active", nullable = false)
-    private String isActive;
+    private boolean isActive;
 
     @CreatedDate
     private LocalDateTime createdAt;
