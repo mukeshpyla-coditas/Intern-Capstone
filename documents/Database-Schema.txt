@@ -1,0 +1,66 @@
+ENTITIES:
+1. Users:
+	=> first_name
+	=> last_name
+	=> username
+	=> password
+	=> email
+	=> contact_number
+	=> is_active
+	=> created_at
+	=> updated_at
+	
+2. Intern
+	=> id
+	=> user_id(reference-key)
+	=> on_boarding_hr_id(hr_id)
+	=> created_at(the date on which INTERN has clicked the sign-in link and registered as a NEW-Intern)
+	=> onboarding_status(IN_PROGRESS, ISSUE, COMPLETED)
+	=> manager_id(respective manager-id)
+
+3. Documents:
+	=> id
+	=> intern_id(reference-key)
+	=> doc_type(enum)
+	=> uploaded_at(DATETIME)
+	=> require_manager_approval(boolean)
+	=> hr_approval_status(enum)
+	=> document_location(in the local-storage)
+	
+4. Document-Issues:
+	=> id
+	=> document_id(reference-key)
+	=> issue_description
+	=> issued_at
+	=> raised_by
+	
+5. Progress:
+	=> id
+	=> intern_id
+	=> acknowledgement_form_1
+	=> acknowledgement_form_2
+	=> fill_intern_personal_details
+	=> upload_signed_offer
+	=> upload_legal_id
+	=> upload_tax_form
+	=> upload_tenth_certification
+	=> upload_intermediate_certification
+	=> upload_latest_semester_marksheet
+	
+6. Tasks:
+	=> id
+	=> intern_id
+	=> task_type(enum)
+	=> task_description
+	=> task_status(enum)
+	=> completed_at(DATETIME)
+	
+7. Complaints:
+	=> id
+	=> intern_id
+	=> complaint_description
+	=> raised_at
+	
+	
+NOTE-POINTS:
+1. Inlcude manager_id in the invitation token that is sent to the intern at the time of on-boarding
