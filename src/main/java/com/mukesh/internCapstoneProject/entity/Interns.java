@@ -1,6 +1,8 @@
 package com.mukesh.internCapstoneProject.entity;
 
+import com.mukesh.internCapstoneProject.enums.OnboardingStatus;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,6 +24,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@Entity
 @Setter
 @Getter
 @Builder
@@ -51,5 +54,5 @@ public class Interns {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "onboarding_status", nullable = false)
-    private String onboardingStatus;
+    private OnboardingStatus onboardingStatus;
 }

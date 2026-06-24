@@ -1,4 +1,4 @@
-package com.mukesh.internCapstoneProject.service.implementations;
+package com.mukesh.internCapstoneProject.service;
 
 import com.mukesh.internCapstoneProject.dto.request.InviteUserRequestDTO;
 import com.mukesh.internCapstoneProject.dto.request.UserLoginRequestDTO;
@@ -12,8 +12,6 @@ import com.mukesh.internCapstoneProject.exception.EntityAlreadyExistsException;
 import com.mukesh.internCapstoneProject.exception.ExceptionMessages;
 import com.mukesh.internCapstoneProject.repository.RefreshTokensRepository;
 import com.mukesh.internCapstoneProject.repository.UsersRepository;
-import com.mukesh.internCapstoneProject.service.interfaces.MailService;
-import com.mukesh.internCapstoneProject.service.interfaces.UsersService;
 import com.mukesh.internCapstoneProject.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,16 +29,15 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements UsersService {
+public class UserServiceImpl {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final CommonServiceImpl commonService;
     private final RefreshTokensRepository refreshTokensRepository;
-    private final MailService mailService;
+    private final MailServiceImpl mailService;
 
-    @Override
     @Transactional
     public String registerUser(UserRegisterRequestDTO request) {
         if(usersRepository.existsByUsername((request.username()))) throw new EntityAlreadyExistsException(ExceptionMessages.USER_WITH_USERNAME_EXISTS);
@@ -62,7 +59,6 @@ public class UserServiceImpl implements UsersService {
         return "HR " + newUser.getFirstName() + " is successfully registered.";
     }
 
-    @Override
     @Transactional
     public UserLoginResponseDTO loginUser(UserLoginRequestDTO request) {
         try {
@@ -96,12 +92,10 @@ public class UserServiceImpl implements UsersService {
         }
     }
 
-    @Override
     public String inviteManager(InviteUserRequestDTO request) {
         return mailService.sendInvitation(request, "/api/v1/register", commonService.getExistingUser(), Roles.MANAGER);
     }
 
-    @Override
     public String inviteIntern(InviteUserRequestDTO request) {
         return mailService.sendInvitation(request, "/api/v1/register", commonService.getExistingUser(), Roles.NEW_HIRE);
     }

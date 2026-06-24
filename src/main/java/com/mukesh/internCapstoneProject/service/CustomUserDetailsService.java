@@ -1,4 +1,4 @@
-package com.mukesh.internCapstoneProject.service.implementations;
+package com.mukesh.internCapstoneProject.service;
 
 import com.mukesh.internCapstoneProject.exception.NotFoundException;
 import com.mukesh.internCapstoneProject.repository.UsersRepository;

@@ -1,6 +1,7 @@
 package com.mukesh.internCapstoneProject.filter;
 
-import com.mukesh.internCapstoneProject.service.implementations.CustomUserDetailsService;
+import com.mukesh.internCapstoneProject.exception.ExceptionMessages;
+import com.mukesh.internCapstoneProject.service.CustomUserDetailsService;
 import com.mukesh.internCapstoneProject.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,9 +31,17 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
 
-        if(header != null && header.startsWith("Bearer ")) {
-            token = header.substring(7);
-            username = jwtUtil.extractUsername(token);
+        if(header != null) {
+            if(header.startsWith("Bearer ")) {
+                token = header.substring(7);
+                username = jwtUtil.extractUsername(token);
+            }
+            else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("application/json");
+                response.getWriter().write(ExceptionMessages.BEARER_TOKEN_EXCEPTION);
+                return;
+            }
         }
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null && jwtUtil.isTokenValid(token)) {

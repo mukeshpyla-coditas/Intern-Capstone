@@ -2,6 +2,7 @@ package com.mukesh.internCapstoneProject.entity;
 
 import com.mukesh.internCapstoneProject.enums.Roles;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+@Entity
 @Setter
 @Getter
 @Builder

@@ -2,7 +2,7 @@ package com.mukesh.internCapstoneProject.config;
 
 import com.mukesh.internCapstoneProject.enums.Roles;
 import com.mukesh.internCapstoneProject.filter.JwtFilter;
-import com.mukesh.internCapstoneProject.service.implementations.CustomUserDetailsService;
+import com.mukesh.internCapstoneProject.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

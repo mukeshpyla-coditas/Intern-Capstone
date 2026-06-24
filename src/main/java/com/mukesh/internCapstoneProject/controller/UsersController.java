@@ -5,7 +5,7 @@ import com.mukesh.internCapstoneProject.dto.request.UserLoginRequestDTO;
 import com.mukesh.internCapstoneProject.dto.request.UserRegisterRequestDTO;
 import com.mukesh.internCapstoneProject.dto.response.UserLoginResponseDTO;
 import com.mukesh.internCapstoneProject.global.ApiResponse;
-import com.mukesh.internCapstoneProject.service.interfaces.UsersService;
+import com.mukesh.internCapstoneProject.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "Users related APIs")
 public class UsersController {
-    private final UsersService usersService;
+    private final UserServiceImpl usersService;
 
     @PostMapping("/register/hr")
     public ResponseEntity<ApiResponse<String>> registerHr(@RequestBody @Valid UserRegisterRequestDTO request) {
@@ -48,7 +48,7 @@ public class UsersController {
         String response = usersService.inviteManager(request);
         return ApiResponse.success(
                 HttpStatus.OK,
-                "Invite to the specified Manager-mail is sent.",
+                "Invite to the specified Manager-mailID is sent.",
                 response
         );
     }
@@ -58,7 +58,7 @@ public class UsersController {
         String response = usersService.inviteIntern(request);
         return ApiResponse.success(
                 HttpStatus.OK,
-                "Invite to the specified intern-mail is sent.",
+                "Invite to the specified intern-mailID is sent.",
                 response
         );
     }

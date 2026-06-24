@@ -1,4 +1,4 @@
-package com.mukesh.internCapstoneProject.service.implementations;
+package com.mukesh.internCapstoneProject.service;
 
 import com.mukesh.internCapstoneProject.dto.request.InviteUserRequestDTO;
 import com.mukesh.internCapstoneProject.entity.Invitations;
@@ -7,7 +7,6 @@ import com.mukesh.internCapstoneProject.enums.InvitationStatus;
 import com.mukesh.internCapstoneProject.enums.Roles;
 import com.mukesh.internCapstoneProject.exception.MailSenderException;
 import com.mukesh.internCapstoneProject.repository.InvitationsRepository;
-import com.mukesh.internCapstoneProject.service.interfaces.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
@@ -20,7 +19,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MailServiceImpl  implements MailService {
+public class MailServiceImpl {
     private final JavaMailSender javaMailSender;
     private final InvitationsRepository invitationsRepository;
 
@@ -39,7 +38,6 @@ public class MailServiceImpl  implements MailService {
         }
     }
 
-    @Override
     public String sendInvitation(InviteUserRequestDTO request, String url, Users sender, Roles role) {
         String inviteToken = UUID.randomUUID().toString();
         String link = "https://playtime-sanitary-nutcase.ngrok-free.dev" + url + inviteToken;
