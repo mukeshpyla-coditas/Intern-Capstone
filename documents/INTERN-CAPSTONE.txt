@@ -1,0 +1,59 @@
+﻿INTERN-CAPSTONE
+
+* FUNCTIONAL REQUIREMENTS:
+   * NEW-HIRE:
+      * Receive sign-in mail from the Companies HR.
+      * Sing-in to the platform
+      * Sees their personal on-boarding road-map, in an ordered format, with attached dead-lines.
+      * Read and acknowledge the policies
+      * Fill-in required details.
+      * Upload the documents they are asked for.
+      * Download the materials that the HR has prepared for them, like:
+         * Signed-Offer
+         * ID
+         * Tax and Bank forms
+         * Certifications
+      * View their own progress as they fill in as they complete things
+   * MANAGER:
+      * Sign-in to the system
+      * View on-boarding progress of “THEIR OWN” new hires
+      * Approve or disapprove the things that need “MANAGER” approval, like:
+         * Equipment Request
+         * Role-Specific Tasks
+      * Add tasks specific to their team, on top of standard ones.
+      * Should be able to see who are stuck, and must be able to step-in
+   * HR:
+      * Sign-in to the system.
+      * View every NEW-HIRE across the company, like:
+         * Full state of everyone’s on-boarding.
+
+* ONBOARDING FLOW OF NEW-HIRE:
+   * Begins when HR adds a NEW-HIRE and kicks off the journey.
+   * The NEW-HIRE then receives a welcome mail containing:
+      * Warm welcome email.
+      * With a link to sign-up.
+      * And a clear description of what’s ahead.
+   * The MANAGER is notified at the same time that a NEW-HIRE is going to be onboarded.
+   * Now, the NEW-HRE signs-in and works through their tasks.
+   * When the NEW-HIRE logins to the system, they will be redirected to a home-page which contains the list of tasks they need to perform.
+   * These list of tasks include:
+      * Signing up some simple read-only acknowledgements.
+      * Some are forms containing details of the NEW-HIRE.
+         * NOTE that, if there is any wrong data entered by NEW-HIRE must be handled gracefully and intimate with them, what is wrong.
+      * Uploading required documents.
+   * When the NEW-HIRE uploads any documents like, “ID” or “Signed-Offer”, these must be received by the HR-team.
+   * If the HR team finds any issues in the documents, there must be a mail sent to the respective NEW-HIRE consisting of the actual reasons and respective fixes that must happen, and the task reopens again.
+   * The tasks that the NEW-HIRE completes must be visible to the respective MANAGER and the HR-team.
+   * NOTE: Any task that needs a MANAGER-approval must be landing in the manager’s queue. 
+   * When the MANAGER approves a respective task submission, there should be a mail sent to the NEW-HIRE, and the journey moves forward.
+
+* SOME KEY ASPECTS:
+   * Every document that the NEW-HIRE submits should become a part of their permanent record.
+   * Once the NEW-HIRE completes their onboard journey, the NEW-INTERN must receive a “you’re all set” mail. The MANAGER and the HR must also be receiving the status of the NEW-HIRE as completed.
+   * Refuse what shouldn't be allowed gracefully.
+   * Reject bad input helpfully. The user must be knowing what went wrong.
+   * Explain the “impossible” tasks like: 
+      * Trying to re-approve an approved document.
+      * With a graceful message
+   * Keep Accounts and Sign-in trust-worthy.
+      * People sign-in securely and their credentials are protected.

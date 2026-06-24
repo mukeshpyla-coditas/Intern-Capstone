@@ -1,0 +1,30 @@
+﻿DAY-WISE SCHEDULE
+
+* DAY-1:
+   * Analyze Problem Statement
+   * Construct a draft of Functional-Requirements
+   * Construct a draft of Database-Schema
+   * Complete building of Authentication and Authorization part of users(based on roles)
+   * Learning to work with document-storage.
+* DAY-2:
+   * Building the common CRUD functionality(where ever required)
+   * Building the core functionality, like:
+      *  Interns:
+         * Read and acknowledge the policies
+         * Uploading the documents
+         * Downloading the materials posted by HR
+      * HR:
+         * On-boarding interns.
+         * Viewing the progress of the interns
+         * Verifying the uploaded documents and sending mails to the respective interns regarding any issues.
+      * Manager:
+         * View onboarding status of their interns
+         * Verify and approve those documents that require MANAGER-approval.
+         * See whether there are any issues raised by their interns and respond to those complaints.
+   * Learn the concepts required to build the feature “ONBOARD-BUDDY”.
+* DAY-3:
+   * Learn and try to implement the “LIVE-BOARD” feature, as mentioned in the problem statement.
+   * Try to achieve the functionality of “ONBOARD-BUDDY”.
+   * Swagger Documentation building
+   * “README.md” file creation.
+   * Checking the APIs with required requests.
