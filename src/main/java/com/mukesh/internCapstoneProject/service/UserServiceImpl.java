@@ -36,7 +36,7 @@ public class UserServiceImpl {
     private final AuthenticationManager authenticationManager;
     private final CommonServiceImpl commonService;
     private final RefreshTokensRepository refreshTokensRepository;
-    private final MailServiceImpl mailService;
+    private final MailService mailService;
 
     @Transactional
     public String registerUser(UserRegisterRequestDTO request) {

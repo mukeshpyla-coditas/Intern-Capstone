@@ -19,7 +19,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MailServiceImpl {
+public class MailService {
     private final JavaMailSender javaMailSender;
     private final InvitationsRepository invitationsRepository;
 
