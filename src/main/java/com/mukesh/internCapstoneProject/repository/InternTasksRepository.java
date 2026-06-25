@@ -5,6 +5,7 @@ import com.mukesh.internCapstoneProject.entity.Interns;
 import com.mukesh.internCapstoneProject.entity.Tasks;
 import com.mukesh.internCapstoneProject.enums.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +18,7 @@ public interface InternTasksRepository extends JpaRepository<InternTasks, Long> 
     Optional<InternTasks> findByInternAndTask(Interns intern, Tasks task);
 
     Optional<List<InternTasks>> findAllByIntern(Interns intern);
+
+    @Query("select count(i) from InternTasks i")
+    long countFirstBy();
 }
