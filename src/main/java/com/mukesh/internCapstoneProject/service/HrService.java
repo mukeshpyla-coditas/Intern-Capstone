@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class HrService {
     private final TaskService taskService;
-    private final DocumentUploadService documentUploadService;
+    private final DocumentService documentUploadService;
     private final CommonServiceImpl commonService;
 
     public CreateTaskResponseDTO createTask(CreateTaskRequestDTO request) {

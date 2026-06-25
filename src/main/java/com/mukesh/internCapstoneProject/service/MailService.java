@@ -22,6 +22,7 @@ import java.util.UUID;
 public class MailService {
     private final JavaMailSender javaMailSender;
     private final InvitationsRepository invitationsRepository;
+    private final CommonServiceImpl commonServiceImpl;
 
     public void sendMail(String senderMail, String receiverMail, String subject, String message) throws MailSenderException{
         try {
@@ -61,6 +62,7 @@ public class MailService {
                 .receiverMail(request.receiverMail())
                 .invitationStatus(InvitationStatus.ISSUED)
                 .role(role)
+                .sentBy(commonServiceImpl.getExistingUser())
                 .manager(manager)
                 .build();
         invitationsRepository.save(newInvitation);

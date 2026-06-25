@@ -7,15 +7,19 @@ import com.mukesh.internCapstoneProject.enums.Roles;
 import com.mukesh.internCapstoneProject.exception.DataAccessException;
 import com.mukesh.internCapstoneProject.exception.FileCreationException;
 import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
+import com.mukesh.internCapstoneProject.exception.NotFoundException;
 import com.mukesh.internCapstoneProject.repository.PolicyDocumentsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,20 +28,24 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-public class DocumentUploadService {
+public class DocumentService {
     private final String hrFileUploadDir;
+    private final String hrFileUploadFolder;
     private final PolicyDocumentsRepository policyDocumentsRepository;
     private final CommonServiceImpl commonService;
 
-    DocumentUploadService(
+    DocumentService(
             @Value("${file.upload-dir}")
             String hrFileUploadDir,
+            @Value("${file.upload-folder}")
+            String hrFileUploadFolder,
             PolicyDocumentsRepository policyDocumentsRepository,
             CommonServiceImpl commonService
     ) {
         this.hrFileUploadDir = hrFileUploadDir;
         this.policyDocumentsRepository = policyDocumentsRepository;
         this.commonService = commonService;
+        this.hrFileUploadFolder = hrFileUploadFolder;
     }
 
     public String uploadDocument(DocumentType documentType, MultipartFile file) {
@@ -45,8 +53,7 @@ public class DocumentUploadService {
         if(!existingUser.getRole().equals(Roles.HR)) throw new InvalidRequestException("Only HR can upload the policy-documents.");
 
         if(file.isEmpty()) throw new InvalidRequestException("The file uploaded is empty. Please re-verify and try again.");
-        String folderName = "hr-" + existingUser.getId() + "-" + UUID.randomUUID().toString();
-        Path folderPath = Paths.get(hrFileUploadDir, folderName);
+        Path folderPath = Paths.get(hrFileUploadDir, hrFileUploadFolder);
 
         try {
             Files.createDirectories(folderPath);
@@ -65,6 +72,7 @@ public class DocumentUploadService {
         try {
             PolicyDocuments documents = PolicyDocuments.builder()
                     .documentType(documentType)
+                    .fileName(fileName)
                     .fileExtension(extension)
                     .fileLocation(folderPath.toString())
                     .uploadedBy(existingUser)
@@ -77,5 +85,17 @@ public class DocumentUploadService {
         }
 
         return "A new policy document has been created in the path: " + folderPath.toString();
+    }
+
+    public Resource downloadFiles(Long documentId) {
+        PolicyDocuments documents = policyDocumentsRepository.findById(documentId).orElseThrow(() -> new NotFoundException("Policy Document with specified ID, does not exist."));
+        Path path = Paths.get(documents.getFileLocation());
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            if(!resource.exists()) throw new InvalidRequestException("No resource available with specified document's location.");
+            return resource;
+        } catch (MalformedURLException e) {
+            throw new InvalidRequestException("The document's location is not valid. Please verify and try again.");
+        }
     }
 }

@@ -26,6 +26,10 @@ public class TaskService {
         return tasksRepository.findAll();
     }
 
+    public Tasks findById(Long id) {
+        return tasksRepository.findById(id).orElseThrow(() -> new NotFoundException("No task found with specified taskID."));
+    }
+
     public CreateTaskResponseDTO createTask(CreateTaskRequestDTO request) {
         if(tasksRepository.existsByTaskType(request.taskType())) throw new EntityAlreadyExistsException(ExceptionMessages.TASK_ALREADY_EXISTS);
 
@@ -34,6 +38,7 @@ public class TaskService {
                 .taskType(request.taskType())
                 .taskDescription(request.taskDescription())
                 .createdAt(LocalDateTime.now())
+                .isSubmittable(request.isSubmittable())
                 .build();
         tasksRepository.save(newTask);
         log.info("A new task of type {} is successfully created.", newTask.getTaskType());

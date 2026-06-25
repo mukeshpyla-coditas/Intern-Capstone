@@ -4,6 +4,7 @@ import com.mukesh.internCapstoneProject.entity.Invitations;
 import com.mukesh.internCapstoneProject.entity.Users;
 import com.mukesh.internCapstoneProject.enums.DocumentType;
 import com.mukesh.internCapstoneProject.enums.InvitationStatus;
+import com.mukesh.internCapstoneProject.enums.TaskStatus;
 import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
 import com.mukesh.internCapstoneProject.exception.NotFoundException;
 import com.mukesh.internCapstoneProject.exception.TokenExpiredException;
@@ -49,5 +50,20 @@ public class CommonServiceImpl {
         if(!flag) throw new InvalidRequestException("Enter valid DocumentType");
         return response;
     }
+
+    public TaskStatus checkTaskStatus(String taskStatus) {
+        boolean flag = false;
+        TaskStatus response = null;
+        for(TaskStatus type : TaskStatus.values()) {
+            if(type.name().equalsIgnoreCase(taskStatus)) {
+                response = type;
+                flag = true;
+                break;
+            }
+        }
+        if(!flag) throw new InvalidRequestException("Enter valid TaskStatus.");
+        return response;
+    }
+
 
 }

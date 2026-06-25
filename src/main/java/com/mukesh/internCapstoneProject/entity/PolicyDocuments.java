@@ -43,6 +43,9 @@ public class PolicyDocuments {
     @Column(name = "file_location", nullable = false)
     private String fileLocation;
 
+    @Column(name = "file_name", nullable = false)
+    private String fileName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploaded_by", nullable = false)
     private Users uploadedBy;
