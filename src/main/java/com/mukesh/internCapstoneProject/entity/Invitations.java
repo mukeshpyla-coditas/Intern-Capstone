@@ -56,4 +56,8 @@ public class Invitations {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id", referencedColumnName = "id")
     private Users manager;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hr_id", referencedColumnName = "id", nullable = false)
+    private Users sentBy;
 }

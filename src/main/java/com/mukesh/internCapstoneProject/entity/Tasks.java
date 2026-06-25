@@ -45,4 +45,7 @@ public class Tasks {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @Column(name = "is_submittable", nullable = false)
+    private boolean isSubmittable;
 }

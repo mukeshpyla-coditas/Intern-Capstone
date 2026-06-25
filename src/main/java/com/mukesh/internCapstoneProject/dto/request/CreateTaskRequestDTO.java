@@ -9,6 +9,8 @@ public record CreateTaskRequestDTO(
         @NotBlank
         String taskDescription,
         @NotNull
-        Integer taskPriority
+        Integer taskPriority,
+        @NotNull
+        boolean isSubmittable
 ) {
 }
