@@ -66,4 +66,8 @@ public class TaskService {
                 .taskPriority(requestedTask.getTaskPriority())
                 .build();
     }
+
+    public Tasks findTaskByTaskType(String taskType) {
+        return tasksRepository.findByTaskType(taskType).orElseThrow(() -> new NotFoundException("There is no task found with specified task type"));
+    }
 }

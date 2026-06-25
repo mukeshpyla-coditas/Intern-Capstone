@@ -2,6 +2,7 @@ package com.mukesh.internCapstoneProject.entity;
 
 import com.mukesh.internCapstoneProject.enums.DocumentType;
 import com.mukesh.internCapstoneProject.enums.HrApprovalStatus;
+import com.mukesh.internCapstoneProject.enums.ManagerApprovalStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -48,8 +49,9 @@ public class Documents {
     @CreatedDate
     private LocalDateTime updatedAt;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "require_manager_approval", nullable = false)
-    private boolean requireManagerApproval;
+    private ManagerApprovalStatus requireManagerApproval;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "hr_approval_status", nullable = false)

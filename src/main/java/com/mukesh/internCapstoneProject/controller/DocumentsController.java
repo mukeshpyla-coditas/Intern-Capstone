@@ -2,6 +2,7 @@ package com.mukesh.internCapstoneProject.controller;
 
 import com.mukesh.internCapstoneProject.service.InternService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -19,10 +20,9 @@ public class DocumentsController {
     private final InternService internService;
 
     @GetMapping("/download/{documentId}")
-    public ResponseEntity<Resource> downloadPolicyDocument(@PathVariable Long documentId) {
+    public ResponseEntity<Resource> downloadPolicyDocument(@PathVariable @NotNull Long documentId) {
         Resource resource = internService.downloadPolicyDocument(documentId);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"").body(resource);
     }
 }

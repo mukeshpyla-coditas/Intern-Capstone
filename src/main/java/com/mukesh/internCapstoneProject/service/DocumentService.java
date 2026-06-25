@@ -62,6 +62,9 @@ public class DocumentService {
         if(!existingUser.getRole().equals(Roles.HR)) throw new InvalidRequestException("Only HR can upload the policy-documents.");
 
         if(file.isEmpty()) throw new InvalidRequestException("The file uploaded is empty. Please re-verify and try again.");
+        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+        if(extension != null && extension.contains("pdf")) throw new InvalidRequestException("The uploaded document must be a '.pdf' file. So, re-verify and try again.");
+
         Path folderPath = Paths.get(hrFileUploadDir, hrFileUploadFolder);
 
         try {
@@ -70,7 +73,6 @@ public class DocumentService {
             throw new FileCreationException("Exception while creating folder-path.");
         }
 
-        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
         String fileName = documentType.name() + "_" + UUID.randomUUID() + "." + extension;
         Path filePath = folderPath.resolve(fileName);
         try {
@@ -102,6 +104,9 @@ public class DocumentService {
         Interns requestedIntern = internsRepository.findByIntern(existingUser).orElseThrow(() -> new NotFoundException("Intern with specified User-credentials is not found."));
 
         if(file.isEmpty()) throw new InvalidRequestException("The file uploaded is empty. Please re-verify and try again.");
+        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+        if(extension != null && extension.contains("pdf")) throw new InvalidRequestException("The uploaded document must be a '.pdf' file. So, re-verify and try again.");
+
         String folderName = "intern-" + requestedIntern.getId();
         Path folderPath = Paths.get(internFileUploadDir, folderName);
         try {
@@ -110,7 +115,6 @@ public class DocumentService {
             throw new FileCreationException("Exception while creating and storing folder-path.");
         }
 
-        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
         String fileName = documentType.name() + "_" + UUID.randomUUID() + "." + extension;
         Path filePath = folderPath.resolve(fileName);
         try {
