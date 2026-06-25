@@ -4,13 +4,13 @@ import com.mukesh.internCapstoneProject.entity.PolicyDocuments;
 import com.mukesh.internCapstoneProject.entity.Users;
 import com.mukesh.internCapstoneProject.enums.DocumentType;
 import com.mukesh.internCapstoneProject.enums.Roles;
+import com.mukesh.internCapstoneProject.exception.DataAccessException;
 import com.mukesh.internCapstoneProject.exception.FileCreationException;
 import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
-import com.mukesh.internCapstoneProject.exception.NotFoundException;
 import com.mukesh.internCapstoneProject.repository.PolicyDocumentsRepository;
-import com.mukesh.internCapstoneProject.repository.UsersRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
@@ -44,29 +45,36 @@ public class DocumentUploadService {
         if(!existingUser.getRole().equals(Roles.HR)) throw new InvalidRequestException("Only HR can upload the policy-documents.");
 
         if(file.isEmpty()) throw new InvalidRequestException("The file uploaded is empty. Please re-verify and try again.");
-        Path folderPath = Paths.get(hrFileUploadDir);
+        String folderName = "hr-" + existingUser.getId() + "-" + UUID.randomUUID().toString();
+        Path folderPath = Paths.get(hrFileUploadDir, folderName);
+
         try {
             Files.createDirectories(folderPath);
         } catch (IOException e) {
-            throw new FileCreationException("");
+            throw new FileCreationException("Exception while creating folder-path.");
         }
-        // Gives me the actual extension of the file
+
         String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        String fileName = documentType.name() + "_" + UUID.randomUUID().toString();
+        String fileName = documentType.name() + "_" + UUID.randomUUID() + "." + extension;
+        Path filePath = folderPath.resolve(fileName);
         try {
-            Files.copy(file.getInputStream(), folderPath);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new FileCreationException("Error while creating the copy the file locally.");
+            throw new FileCreationException("Error while creating the copy of the file locally.");
         }
-        PolicyDocuments documents = PolicyDocuments.builder()
-                .fileName(fileName)
-                .documentType(documentType)
-                .fileExtension(extension)
-                .fileLocation(folderPath.toString())
-                .uploadedBy(existingUser)
-                .build();
-        policyDocumentsRepository.save(documents);
-        log.info("A new document is stored");
+        try {
+            PolicyDocuments documents = PolicyDocuments.builder()
+                    .documentType(documentType)
+                    .fileExtension(extension)
+                    .fileLocation(folderPath.toString())
+                    .uploadedBy(existingUser)
+                    .build();
+            policyDocumentsRepository.save(documents);
+            log.info("A new document is stored");
+        } catch (JpaSystemException exception) {
+            log.error("There was an internal error while uploading the details of the file.");
+            throw new DataAccessException("Internal upload error.");
+        }
 
         return "A new policy document has been created in the path: " + folderPath.toString();
     }
