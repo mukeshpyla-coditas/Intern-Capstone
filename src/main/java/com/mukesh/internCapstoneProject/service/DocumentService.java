@@ -1,5 +1,6 @@
 package com.mukesh.internCapstoneProject.service;
 
+import com.mukesh.internCapstoneProject.entity.Interns;
 import com.mukesh.internCapstoneProject.entity.PolicyDocuments;
 import com.mukesh.internCapstoneProject.entity.Users;
 import com.mukesh.internCapstoneProject.enums.DocumentType;
@@ -8,6 +9,7 @@ import com.mukesh.internCapstoneProject.exception.DataAccessException;
 import com.mukesh.internCapstoneProject.exception.FileCreationException;
 import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
 import com.mukesh.internCapstoneProject.exception.NotFoundException;
+import com.mukesh.internCapstoneProject.repository.InternsRepository;
 import com.mukesh.internCapstoneProject.repository.PolicyDocumentsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,24 +33,31 @@ import java.util.UUID;
 public class DocumentService {
     private final String hrFileUploadDir;
     private final String hrFileUploadFolder;
+    private final String internFileUploadDir;
     private final PolicyDocumentsRepository policyDocumentsRepository;
     private final CommonServiceImpl commonService;
+    private final InternsRepository internsRepository;
 
     DocumentService(
             @Value("${file.upload-dir}")
             String hrFileUploadDir,
             @Value("${file.upload-folder}")
             String hrFileUploadFolder,
+            @Value("${file.intern.upload-dir}")
+            String internFileUploadDir,
             PolicyDocumentsRepository policyDocumentsRepository,
-            CommonServiceImpl commonService
+            CommonServiceImpl commonService,
+            InternsRepository internsRepository
     ) {
         this.hrFileUploadDir = hrFileUploadDir;
         this.policyDocumentsRepository = policyDocumentsRepository;
         this.commonService = commonService;
         this.hrFileUploadFolder = hrFileUploadFolder;
+        this.internFileUploadDir = internFileUploadDir;
+        this.internsRepository = internsRepository;
     }
 
-    public String uploadDocument(DocumentType documentType, MultipartFile file) {
+    public String uploadPolicyDocument(DocumentType documentType, MultipartFile file) {
         Users existingUser = commonService.getExistingUser();
         if(!existingUser.getRole().equals(Roles.HR)) throw new InvalidRequestException("Only HR can upload the policy-documents.");
 
@@ -85,6 +94,32 @@ public class DocumentService {
         }
 
         return "A new policy document has been created in the path: " + folderPath.toString();
+    }
+
+    public String uploadDocuments(DocumentType documentType, MultipartFile file) {
+        Users existingUser = commonService.getExistingUser();
+        if(!existingUser.getRole().equals(Roles.NEW_HIRE)) throw new InvalidRequestException("Only Interns can upload intern-related documents.");
+        Interns requestedIntern = internsRepository.findByIntern(existingUser).orElseThrow(() -> new NotFoundException("Intern with specified User-credentials is not found."));
+
+        if(file.isEmpty()) throw new InvalidRequestException("The file uploaded is empty. Please re-verify and try again.");
+        String folderName = "intern-" + requestedIntern.getId();
+        Path folderPath = Paths.get(internFileUploadDir, folderName);
+        try {
+            Files.createDirectories(folderPath);
+        } catch (IOException e) {
+            throw new FileCreationException("Exception while creating and storing folder-path.");
+        }
+
+        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+        String fileName = documentType.name() + "_" + UUID.randomUUID() + "." + extension;
+        Path filePath = folderPath.resolve(fileName);
+        try {
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new FileCreationException("Error while creating a copy of the file locally.");
+        }
+
+        return filePath.toString();
     }
 
     public Resource downloadFiles(Long documentId) {

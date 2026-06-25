@@ -39,6 +39,7 @@ public class TaskService {
                 .taskDescription(request.taskDescription())
                 .createdAt(LocalDateTime.now())
                 .isSubmittable(request.isSubmittable())
+                .requireManagerApproval(request.requireManagerApproval())
                 .build();
         tasksRepository.save(newTask);
         log.info("A new task of type {} is successfully created.", newTask.getTaskType());
