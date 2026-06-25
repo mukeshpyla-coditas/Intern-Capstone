@@ -15,4 +15,6 @@ public interface InternTasksRepository extends JpaRepository<InternTasks, Long> 
     Optional<List<InternTasks>> findAllByInternAndTaskStatus(Interns intern, TaskStatus taskStatus);
 
     Optional<InternTasks> findByInternAndTask(Interns intern, Tasks task);
+
+    Optional<List<InternTasks>> findAllByIntern(Interns intern);
 }

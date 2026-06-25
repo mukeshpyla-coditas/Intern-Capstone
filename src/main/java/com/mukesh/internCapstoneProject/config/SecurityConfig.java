@@ -26,6 +26,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users/invite/**").hasRole(Roles.HR.name())
                         .requestMatchers("/api/v1/hr/**").hasRole(Roles.HR.name())
                         .requestMatchers("/api/v1/intern/**").hasRole(Roles.NEW_HIRE.name())
+                        .requestMatchers("/api/v1/manager/**").hasRole(Roles.MANAGER.name())
         );
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         httpSecurity.httpBasic(Customizer.withDefaults());

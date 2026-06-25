@@ -1,6 +1,7 @@
 package com.mukesh.internCapstoneProject.service;
 
 import com.mukesh.internCapstoneProject.dto.response.FetchAllTasksResponseDTO;
+import com.mukesh.internCapstoneProject.dto.response.FetchInternsResponseDTO;
 import com.mukesh.internCapstoneProject.entity.Documents;
 import com.mukesh.internCapstoneProject.entity.InternTasks;
 import com.mukesh.internCapstoneProject.entity.Interns;
@@ -9,24 +10,29 @@ import com.mukesh.internCapstoneProject.entity.Tasks;
 import com.mukesh.internCapstoneProject.entity.Users;
 import com.mukesh.internCapstoneProject.enums.DocumentType;
 import com.mukesh.internCapstoneProject.enums.HrApprovalStatus;
+import com.mukesh.internCapstoneProject.enums.ManagerApprovalStatus;
 import com.mukesh.internCapstoneProject.enums.OnboardingStatus;
 import com.mukesh.internCapstoneProject.enums.TaskStatus;
 import com.mukesh.internCapstoneProject.exception.DataAccessException;
 import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
 import com.mukesh.internCapstoneProject.exception.NotFoundException;
+import com.mukesh.internCapstoneProject.global.PageResponse;
 import com.mukesh.internCapstoneProject.repository.DocumentsRepository;
 import com.mukesh.internCapstoneProject.repository.InternsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +44,7 @@ public class InternService {
     private final DocumentsRepository documentsRepository;
     private final InternTaskService internTaskService;
     private final DocumentService documentService;
+    private static final Set<DocumentType> APPROVAL_REQUIRED_DOCUMENTS = Set.of(DocumentType.TENTH_CERTIFICATE, DocumentType.INTERMEDIATE_CERTIFICATE, DocumentType.LATEST_SEMESTER_MARKSHEET);
 
     public void saveIntern(Users intern, Invitations invitation) {
         Interns newIntern = Interns.builder()
@@ -100,14 +107,17 @@ public class InternService {
         Tasks requestedTask = taskService.findById(taskId);
         DocumentType documentType = commonService.checkDocumentType(requestedTask.getTaskType());
         String filePath = documentService.uploadDocuments(documentType, file);
-        Interns intern = getIntern(commonService.getExistingUser());
+        Interns intern = getInternByUser(commonService.getExistingUser());
         Documents requestedDocument = Documents.builder()
                 .internId(intern)
                 .documentLocation(filePath)
                 .documentType(documentType)
                 .hrApprovalStatus(HrApprovalStatus.IN_PROGRESS)
-                .requireManagerApproval(requestedTask.isRequireManagerApproval())
                 .build();
+
+        if(APPROVAL_REQUIRED_DOCUMENTS.contains(documentType)) requestedDocument.setRequireManagerApproval(ManagerApprovalStatus.MARKED_FOR_APPROVAL);
+        else requestedDocument.setRequireManagerApproval(ManagerApprovalStatus.NOT_REQUIRED);
+
         documentsRepository.save(requestedDocument);
         log.info("New record of documents with documentType: {} is created for intern {}", documentType.name(), intern.getIntern().getFirstName());
 
@@ -115,8 +125,12 @@ public class InternService {
         else return "Document is uploaded successfully. Please wait for the approval of HR-team.";
     }
 
-    public Interns getIntern(Users user) {
+    public Interns getInternByUser(Users user) {
         return internsRepository.findByIntern(user).orElseThrow(() -> new NotFoundException("No intern is found with specified User credentials."));
+    }
+
+    public Interns getInternById(Long internId) {
+        return internsRepository.findById(internId).orElseThrow(() -> new NotFoundException("No intern is found with the specified ID."));
     }
 
     public Resource downloadPolicyDocument(Long documentId) {
@@ -125,6 +139,18 @@ public class InternService {
 
     public Page<Interns> fetchAllInternsByManager(Users manager, Pageable pageable) {
         return internsRepository.findAllByManagerId(manager, pageable);
+    }
+
+    public boolean checkIfAllTasksCompleted(Interns intern) {
+        List<InternTasks> internTasksList = internTaskService.fetchAllInternTasks(intern);
+        boolean flag = true;
+        for(InternTasks internTask : internTasksList){
+            if(!internTask.getTaskStatus().equals(TaskStatus.COMPLETED)) {
+                flag = false;
+                break;
+            }
+        }
+        return flag;
     }
 }
 

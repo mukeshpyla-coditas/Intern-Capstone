@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface TasksRepository extends JpaRepository<Tasks, Long> {
     boolean existsByTaskType(String taskType);
+
+    Optional<Tasks> findByTaskType(String taskType);
 }
