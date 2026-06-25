@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class UsersController {
     private final UserServiceImpl usersService;
 
-    @PostMapping("/register/hr")
+    // Use just to populate the HR data
+    @PostMapping("/register")
     public ResponseEntity<ApiResponse<String>> registerHr(@RequestBody @Valid UserRegisterRequestDTO request) {
         String response = usersService.registerUser(request);
         return ApiResponse.success(
@@ -34,15 +36,12 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserLoginResponseDTO>> loginUser(@RequestBody @Valid UserLoginRequestDTO request) {
+    public ResponseEntity<UserLoginResponseDTO> loginUser(@RequestBody @Valid UserLoginRequestDTO request) {
         UserLoginResponseDTO response = usersService.loginUser(request);
-        return ApiResponse.success(
-                HttpStatus.OK,
-                "User is logged-in successfully.",
-                response
-        );
+        return ResponseEntity.ok(response);
     }
 
+    // Invitation sent to the manager
     @PostMapping("/invite/manager")
     public ResponseEntity<ApiResponse<String>> inviteManager(@RequestBody @Valid InviteUserRequestDTO request) {
         String response = usersService.inviteManager(request);
@@ -53,13 +52,26 @@ public class UsersController {
         );
     }
 
-    @PostMapping("/invite/intern")
-    public ResponseEntity<ApiResponse<String>> inviteIntern(@RequestBody @Valid InviteUserRequestDTO request) {
-        String response = usersService.inviteIntern(request);
+    // Invitation sent to the intern
+    @PostMapping("/invite/intern/{managerId}")
+    public ResponseEntity<ApiResponse<String>> inviteIntern(@PathVariable Long managerId, @RequestBody @Valid InviteUserRequestDTO request) {
+        String response = usersService.inviteIntern(request, managerId);
         return ApiResponse.success(
                 HttpStatus.OK,
                 "Invite to the specified intern-mailID is sent.",
                 response
         );
+    }
+
+    // Registering the Manager
+    @PostMapping("/register/manager/{inviteCode}")
+    public ResponseEntity<String> registerManager(@PathVariable String inviteCode, @RequestBody @Valid UserRegisterRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(usersService.registerManager(request, inviteCode));
+    }
+
+    // Registering the Intern
+    @PostMapping("/register/intern/{inviteCode}")
+    public ResponseEntity<String> registerIntern(@PathVariable String inviteCode, @RequestBody @Valid UserRegisterRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(usersService.registerIntern(request, inviteCode));
     }
 }

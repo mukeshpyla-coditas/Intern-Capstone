@@ -44,6 +44,9 @@ public class InternTasks {
     @Column(name = "task_status", nullable = false)
     private TaskStatus taskStatus;
 
-    @Column(name = "completed_at", nullable = false)
+    @Column(name = "deadline", nullable = false)
+    private LocalDateTime deadline;
+
+    @Column(name = "completed_at")
     private LocalDateTime completedAt;
 }

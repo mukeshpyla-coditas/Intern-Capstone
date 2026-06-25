@@ -54,6 +54,6 @@ public class Invitations {
     private Roles role;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manager_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "manager_id", referencedColumnName = "id")
     private Users manager;
 }

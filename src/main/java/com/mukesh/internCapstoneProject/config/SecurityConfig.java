@@ -24,6 +24,8 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(http ->
                 http.requestMatchers("/api/v1/users/register/hr", "/api/v1/users/login").permitAll()
                         .requestMatchers("/api/v1/users/invite/**").hasRole(Roles.HR.name())
+                        .requestMatchers("/api/v1/hr/**").hasRole(Roles.HR.name())
+                        .requestMatchers("/api/v1/intern/**").hasRole(Roles.NEW_HIRE.name())
         );
         httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         httpSecurity.httpBasic(Customizer.withDefaults());

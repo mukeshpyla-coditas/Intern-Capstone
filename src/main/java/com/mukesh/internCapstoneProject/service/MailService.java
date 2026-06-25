@@ -38,7 +38,18 @@ public class MailService {
         }
     }
 
-    public String sendInvitation(InviteUserRequestDTO request, String url, Users sender, Roles role) {
+    public String sendInvitation(InviteUserRequestDTO request, Users sender, String mailMessage) {
+        try {
+            sendMail(sender.getEmail(), request.receiverMail(), request.mailSubject(), mailMessage);
+            log.error("There was an error while sending the mail.");
+        } catch (MailSenderException exception) {
+            throw new MailSenderException("There was an exception while sending the mail");
+        }
+
+        return "Mail is successfully sent";
+    }
+
+    public String createInvite(InviteUserRequestDTO request, String url, Roles role, Users manager) {
         String inviteToken = UUID.randomUUID().toString();
         String link = "https://playtime-sanitary-nutcase.ngrok-free.dev" + url + inviteToken;
         String mailMessage = request.mailMessage() + "\n" + link;
@@ -50,17 +61,11 @@ public class MailService {
                 .receiverMail(request.receiverMail())
                 .invitationStatus(InvitationStatus.ISSUED)
                 .role(role)
+                .manager(manager)
                 .build();
         invitationsRepository.save(newInvitation);
         log.info("Created a new new invitation for the requested user: {}", request.receiverMail());
 
-        try {
-            sendMail(sender.getEmail(), request.receiverMail(), request.mailSubject(), mailMessage);
-            log.error("There was an error while sending the mail.");
-        } catch (MailSenderException exception) {
-            throw new MailSenderException("There was an exception while sending the mail");
-        }
-
-        return "Mail is successfully sent";
+        return mailMessage;
     }
 }

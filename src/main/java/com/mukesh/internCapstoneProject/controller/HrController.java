@@ -7,13 +7,17 @@ import com.mukesh.internCapstoneProject.service.HrService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/hr")
@@ -33,4 +37,8 @@ public class HrController {
     }
 
     // Upload materials related to company-policies
+    @PostMapping("/upload/policy-document")
+    public ResponseEntity<String> uploadPolicyDocument(@RequestParam(name = "documentType") String documentType, @RequestPart(name = "file")MultipartFile file) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(hrService.uploadDocument(documentType, file));
+    }
 }

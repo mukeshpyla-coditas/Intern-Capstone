@@ -4,12 +4,17 @@ import com.mukesh.internCapstoneProject.dto.request.InviteUserRequestDTO;
 import com.mukesh.internCapstoneProject.dto.request.UserLoginRequestDTO;
 import com.mukesh.internCapstoneProject.dto.request.UserRegisterRequestDTO;
 import com.mukesh.internCapstoneProject.dto.response.UserLoginResponseDTO;
+import com.mukesh.internCapstoneProject.entity.Invitations;
 import com.mukesh.internCapstoneProject.entity.RefreshTokens;
 import com.mukesh.internCapstoneProject.entity.Users;
+import com.mukesh.internCapstoneProject.enums.InvitationStatus;
 import com.mukesh.internCapstoneProject.enums.Roles;
 import com.mukesh.internCapstoneProject.exception.AuthenticationException;
 import com.mukesh.internCapstoneProject.exception.EntityAlreadyExistsException;
 import com.mukesh.internCapstoneProject.exception.ExceptionMessages;
+import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
+import com.mukesh.internCapstoneProject.exception.NotFoundException;
+import com.mukesh.internCapstoneProject.exception.TokenExpiredException;
 import com.mukesh.internCapstoneProject.repository.RefreshTokensRepository;
 import com.mukesh.internCapstoneProject.repository.UsersRepository;
 import com.mukesh.internCapstoneProject.util.JwtUtil;
@@ -35,6 +40,7 @@ public class UserServiceImpl {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final CommonServiceImpl commonService;
+    private final InternService internService;
     private final RefreshTokensRepository refreshTokensRepository;
     private final MailService mailService;
 
@@ -43,16 +49,7 @@ public class UserServiceImpl {
         if(usersRepository.existsByUsername((request.username()))) throw new EntityAlreadyExistsException(ExceptionMessages.USER_WITH_USERNAME_EXISTS);
         if(usersRepository.existsByEmail(request.email())) throw new EntityAlreadyExistsException(ExceptionMessages.USER_WITH_EMAIL_EXISTS);
 
-        Users newUser = Users.builder()
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .username(request.username())
-                .password(passwordEncoder.encode(request.password()))
-                .role(Roles.HR)
-                .contactNumber(request.contactNumber())
-                .email(request.email())
-                .isActive(true)
-                .build();
+        Users newUser = createUser(request, Roles.HR);
         usersRepository.save(newUser);
         log.info("HR {} is successfully registered", newUser.getFirstName());
 
@@ -92,11 +89,58 @@ public class UserServiceImpl {
         }
     }
 
+    @Transactional
     public String inviteManager(InviteUserRequestDTO request) {
-        return mailService.sendInvitation(request, "/api/v1/register", commonService.getExistingUser(), Roles.MANAGER);
+        String mailMessage = mailService.createInvite(request, "/api/v1/register/manager", Roles.MANAGER, null);
+        return mailService.sendInvitation(request, commonService.getExistingUser(), mailMessage);
     }
 
-    public String inviteIntern(InviteUserRequestDTO request) {
-        return mailService.sendInvitation(request, "/api/v1/register", commonService.getExistingUser(), Roles.NEW_HIRE);
+    @Transactional
+    public String inviteIntern(InviteUserRequestDTO request, Long managerId) {
+        Users requestedManager = usersRepository.findById(managerId).orElseThrow(() -> new NotFoundException("User with specified ID is not found."));
+        if(!requestedManager.getRole().equals(Roles.MANAGER)) throw new InvalidRequestException("Requested user is not a manager, please re-verify and try again.");
+
+        String mailMessage = mailService.createInvite(request, "/api/v1/register/intern", Roles.NEW_HIRE, requestedManager);
+        return mailService.sendInvitation(request, commonService.getExistingUser(), mailMessage);
+    }
+
+    @Transactional
+    public String registerManager(UserRegisterRequestDTO request, String inviteToken) {
+        Invitations existingInvitation = commonService.checkInviteValidity(inviteToken);
+        Users newManager = createUser(request, Roles.MANAGER);
+        usersRepository.save(newManager);
+        log.info("Created a new Manager. Manager: {}", newManager.getFirstName());
+
+        existingInvitation.setInvitationStatus(InvitationStatus.ACCEPTED);
+        log.info("Marked the invitation as ACCEPTED.");
+
+        return "New Manager record is successfully created.";
+    }
+
+    public String registerIntern(UserRegisterRequestDTO request, String inviteToken) {
+        Invitations existingInvitation = commonService.checkInviteValidity(inviteToken);
+        Users newIntern = createUser(request, Roles.NEW_HIRE);
+        usersRepository.save(newIntern);
+        log.info("Created a new User(intern).");
+
+        internService.saveIntern(newIntern, existingInvitation);
+
+        existingInvitation.setInvitationStatus(InvitationStatus.ACCEPTED);
+        log.info("Marked the invitation status as ACCEPTED.");
+
+        return "New Intern record is successfully created.";
+    }
+
+    public Users createUser(UserRegisterRequestDTO request, Roles role) {
+        return Users.builder()
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .username(request.username())
+                .password(passwordEncoder.encode(request.password()))
+                .role(role)
+                .contactNumber(request.contactNumber())
+                .email(request.email())
+                .isActive(true)
+                .build();
     }
 }
