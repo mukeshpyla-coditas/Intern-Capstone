@@ -27,6 +27,6 @@ public class HrService {
 
     public String uploadDocument(String documentType, MultipartFile file) {
         DocumentType requestedDocumentType = commonService.checkDocumentType(documentType);
-        return documentUploadService.uploadDocument(requestedDocumentType, file);
+        return documentUploadService.uploadPolicyDocument(requestedDocumentType, file);
     }
 }

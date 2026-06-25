@@ -36,9 +36,13 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserLoginResponseDTO> loginUser(@RequestBody @Valid UserLoginRequestDTO request) {
+    public ResponseEntity<ApiResponse<UserLoginResponseDTO>> loginUser(@RequestBody @Valid UserLoginRequestDTO request) {
         UserLoginResponseDTO response = usersService.loginUser(request);
-        return ResponseEntity.ok(response);
+        return ApiResponse.success(
+                HttpStatus.OK,
+                "User log-in successful",
+                response
+        );
     }
 
     // Invitation sent to the manager
@@ -65,13 +69,23 @@ public class UsersController {
 
     // Registering the Manager
     @PostMapping("/register/manager/{inviteCode}")
-    public ResponseEntity<String> registerManager(@PathVariable String inviteCode, @RequestBody @Valid UserRegisterRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(usersService.registerManager(request, inviteCode));
+    public ResponseEntity<ApiResponse<String>> registerManager(@PathVariable String inviteCode, @RequestBody @Valid UserRegisterRequestDTO request) {
+        String response = usersService.registerManager(request, inviteCode);
+        return ApiResponse.success(
+                HttpStatus.CREATED,
+                "Manager registered successfully",
+                response
+        );
     }
 
     // Registering the Intern
     @PostMapping("/register/intern/{inviteCode}")
-    public ResponseEntity<String> registerIntern(@PathVariable String inviteCode, @RequestBody @Valid UserRegisterRequestDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(usersService.registerIntern(request, inviteCode));
+    public ResponseEntity<ApiResponse<String>> registerIntern(@PathVariable String inviteCode, @RequestBody @Valid UserRegisterRequestDTO request) {
+        String response = usersService.registerIntern(request, inviteCode);
+        return ApiResponse.success(
+                HttpStatus.CREATED,
+                "Intern registered successfully",
+                response
+        );
     }
 }

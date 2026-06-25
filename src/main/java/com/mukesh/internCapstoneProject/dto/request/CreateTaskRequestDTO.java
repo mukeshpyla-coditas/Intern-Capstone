@@ -11,6 +11,8 @@ public record CreateTaskRequestDTO(
         @NotNull
         Integer taskPriority,
         @NotNull
-        boolean isSubmittable
+        boolean isSubmittable,
+        @NotNull
+        boolean requireManagerApproval
 ) {
 }

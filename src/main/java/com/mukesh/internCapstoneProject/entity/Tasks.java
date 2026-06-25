@@ -48,4 +48,7 @@ public class Tasks {
 
     @Column(name = "is_submittable", nullable = false)
     private boolean isSubmittable;
+
+    @Column(name = "require_manager_approval", nullable = false)
+    private boolean requireManagerApproval;
 }
