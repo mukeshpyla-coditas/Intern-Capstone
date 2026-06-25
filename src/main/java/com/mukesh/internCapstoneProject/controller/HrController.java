@@ -8,6 +8,7 @@ import com.mukesh.internCapstoneProject.dto.response.FetchInternsResponseDTO;
 import com.mukesh.internCapstoneProject.global.ApiResponse;
 import com.mukesh.internCapstoneProject.global.PageResponse;
 import com.mukesh.internCapstoneProject.service.HrService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -34,6 +35,7 @@ import java.util.List;
 public class HrController {
     private final HrService hrService;
 
+    @Operation(summary = "HR creates tasks")
     @PostMapping("/create/tasks")
     public ResponseEntity<ApiResponse<CreateTaskResponseDTO>> createTask(@RequestBody @Valid CreateTaskRequestDTO request) {
         CreateTaskResponseDTO response = hrService.createTask(request);
@@ -44,17 +46,18 @@ public class HrController {
         );
     }
 
+    @Operation(summary = "HR can update tasks")
     @PatchMapping("/upadate/task")
     public ResponseEntity<ApiResponse<CreateTaskResponseDTO>> updateTask(@RequestBody @Valid UpdateExistingTaskRequestDTO request) {
         CreateTaskResponseDTO response = hrService.updateExistingTask(request);
         return ApiResponse.success(
                 HttpStatus.OK,
-                "Task Details are upadated successfully",
+                "Task Details are updated successfully",
                 response
         );
     }
 
-    // Upload materials related to company-policies
+    @Operation(summary = "Upload materials related to company-policies")
     @PostMapping("/upload/policy-document")
     public ResponseEntity<ApiResponse<String>> uploadPolicyDocument(@RequestParam(name = "documentType") @NotNull String documentType, @RequestPart(name = "file") @NotNull  MultipartFile file) {
         String response = hrService.uploadDocument(documentType, file);
@@ -65,6 +68,7 @@ public class HrController {
         );
     }
 
+    @Operation(summary = "HR approves the uploaded documents.")
     @PatchMapping("/approve/document/{documentId}")
     public ResponseEntity<ApiResponse<String>> approveDocuments(@PathVariable @NotNull Long documentId) {
         String response = hrService.approveDocument(documentId);
@@ -75,6 +79,7 @@ public class HrController {
         );
     }
 
+    @Operation(summary = "HR disapproves the uploaded documents.")
     @PatchMapping("/disapprove/document")
     public ResponseEntity<ApiResponse<String>> disapproveDocuments(@RequestBody @Valid DocumentDisapprovalMessageRequestDTO request) {
         String response = hrService.disapproveDocument(request);
@@ -85,6 +90,7 @@ public class HrController {
         );
     }
 
+    @Operation(summary = "HR can retrieve intern-details")
     @GetMapping("/interns")
     public ResponseEntity<PageResponse<List<FetchInternsResponseDTO>>> fetchAllInterns(
             @RequestParam(required = false, name = "page", defaultValue = "0") Integer page,

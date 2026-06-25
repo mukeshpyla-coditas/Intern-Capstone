@@ -6,6 +6,7 @@ import com.mukesh.internCapstoneProject.dto.response.FetchInternsResponseDTO;
 import com.mukesh.internCapstoneProject.global.ApiResponse;
 import com.mukesh.internCapstoneProject.global.PageResponse;
 import com.mukesh.internCapstoneProject.service.ManagerService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ import java.util.List;
 public class ManagerController {
     private final ManagerService managerService;
 
+    @Operation(summary = "Manager fetches details of the interns under his authority.")
     @GetMapping("/interns")
     public ResponseEntity<PageResponse<List<FetchInternsResponseDTO>>> fetchInternsDetails(
             @RequestParam(required = false, name = "page", defaultValue = "0") Integer page,
@@ -40,11 +42,13 @@ public class ManagerController {
         return ResponseEntity.ok(managerService.fetchAllInterns(page, size, sortBy, sortOrder));
     }
 
+    @Operation(summary = "Fetches all the documents which require manager approval.")
     @GetMapping("/approval/documents")
     public ResponseEntity<PageResponse<List<FetchApprovalDocumentsResponseDTO>>> fetchAllDocumentsForApproval(@RequestParam(name = "internId") @NotNull Long internId, @RequestParam(name = "page") @NotNull Integer page) {
         return ResponseEntity.ok(managerService.fetchAllDocumentsForApproval(internId, page));
     }
 
+    @Operation(summary = "Manager will approve the documents which require Manager approval.")
     @PatchMapping("/approve/document/{documentId}")
     public ResponseEntity<ApiResponse<String>> approveDocumentOfIntern(@PathVariable @NotNull Long documentId) {
         String response = managerService.approveDocument(documentId);

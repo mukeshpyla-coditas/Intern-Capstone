@@ -3,6 +3,7 @@ package com.mukesh.internCapstoneProject.controller;
 import com.mukesh.internCapstoneProject.dto.response.FetchAllTasksResponseDTO;
 import com.mukesh.internCapstoneProject.global.ApiResponse;
 import com.mukesh.internCapstoneProject.service.InternService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import java.util.List;
 public class InternController {
     private final InternService internService;
 
+    @Operation(summary = "Intern fetches all the tasks assigned to them")
     @GetMapping("/tasks/{internId}")
     public ResponseEntity<ApiResponse<List<FetchAllTasksResponseDTO>>> fetchAllTasks(
             @PathVariable @NotNull Long internId,
@@ -36,11 +38,12 @@ public class InternController {
         List<FetchAllTasksResponseDTO> response = internService.fetchAllTasks(internId, taskStatus);
         return ApiResponse.success(
                 HttpStatus.OK,
-                "Fectched all the tasks based on the filter",
+                "Fetched all the tasks based on the filter",
                 response
         );
     }
 
+    @Operation(summary = "Intern submits the task after completion(these are submittable tasks only.)")
     @PatchMapping("/submit/task/{taskId}")
     public ResponseEntity<ApiResponse<String>> submitTask(@PathVariable Long taskId) {
         String response = internService.submitTask(taskId);
@@ -51,6 +54,7 @@ public class InternController {
         );
     }
 
+    @Operation(summary = "Intern uploads the documents which are required, by selecting the task.")
     @PostMapping("/{taskId}/upload")
     public ResponseEntity<ApiResponse<String>> uploadDocuments(@PathVariable Long taskId, @RequestPart(name = "file")MultipartFile file) {
         String response = internService.uploadDocuments(taskId, file);

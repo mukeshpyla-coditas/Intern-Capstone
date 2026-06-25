@@ -23,8 +23,7 @@ public class SecurityConfig {
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.authorizeHttpRequests(http ->
                 http.requestMatchers("/api/v1/users/register", "/api/v1/users/register/**", "/api/v1/users/login", "/api/v1/documents/**", "/api/v1/progress/**").permitAll()
-                        .requestMatchers("/api/v1/users/invite/**").hasRole(Roles.HR.name())
-                        .requestMatchers("/api/v1/hr/**").hasRole(Roles.HR.name())
+                        .requestMatchers("/api/v1/users/invite/**", "/api/v1/hr/**").hasRole(Roles.HR.name())
                         .requestMatchers("/api/v1/intern/**").hasRole(Roles.NEW_HIRE.name())
                         .requestMatchers("/api/v1/manager/**").hasRole(Roles.MANAGER.name())
         );
