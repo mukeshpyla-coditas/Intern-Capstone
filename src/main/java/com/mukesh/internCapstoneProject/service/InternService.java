@@ -1,7 +1,7 @@
 package com.mukesh.internCapstoneProject.service;
 
 import com.mukesh.internCapstoneProject.dto.response.FetchAllTasksResponseDTO;
-import com.mukesh.internCapstoneProject.dto.response.FetchInternsResponseDTO;
+import com.mukesh.internCapstoneProject.dto.response.ProgressResponseDTO;
 import com.mukesh.internCapstoneProject.entity.Documents;
 import com.mukesh.internCapstoneProject.entity.InternTasks;
 import com.mukesh.internCapstoneProject.entity.Interns;
@@ -16,16 +16,13 @@ import com.mukesh.internCapstoneProject.enums.TaskStatus;
 import com.mukesh.internCapstoneProject.exception.DataAccessException;
 import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
 import com.mukesh.internCapstoneProject.exception.NotFoundException;
-import com.mukesh.internCapstoneProject.global.PageResponse;
 import com.mukesh.internCapstoneProject.repository.DocumentsRepository;
 import com.mukesh.internCapstoneProject.repository.InternsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +42,7 @@ public class InternService {
     private final InternTaskService internTaskService;
     private final DocumentService documentService;
     private static final Set<DocumentType> APPROVAL_REQUIRED_DOCUMENTS = Set.of(DocumentType.TENTH_CERTIFICATE, DocumentType.INTERMEDIATE_CERTIFICATE, DocumentType.LATEST_SEMESTER_MARKSHEET);
+    private final ProgressService progressService;
 
     public void saveIntern(Users intern, Invitations invitation) {
         Interns newIntern = Interns.builder()
@@ -151,6 +149,11 @@ public class InternService {
             }
         }
         return flag;
+    }
+
+    public ProgressResponseDTO getProgress(Long internId) {
+        Interns requestedIntern = internsRepository.findById(internId).orElseThrow(() -> new NotFoundException("Intern with specified ID does not exist."));
+        return progressService.calculateProgress(requestedIntern);
     }
 }
 
