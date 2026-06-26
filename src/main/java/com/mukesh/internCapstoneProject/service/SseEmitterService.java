@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,13 +36,15 @@ public class SseEmitterService {
                 .title(title)
                 .message(message)
                 .build();
-        try {
+        if(sseEmitterMap.containsKey(userId)) {
             SseEmitter emitter = sseEmitterMap.get(userId);
-            emitter.send(SseEmitter.event().name("Notification").data(notification, MediaType.APPLICATION_JSON));
+            try {
+                emitter.send(SseEmitter.event().name("Notification").data(notification, MediaType.APPLICATION_JSON));
+            } catch (IOException e) {
+                throw new NotificationServiceException("There is an exception while sending the notification to the subscriber.");
+            }
             emitter.complete();
             log.info("Notification has been sent to the browser.");
-        } catch(Exception e) {
-            throw new NotificationServiceException("There was an error while sending notification to the subscribed users.");
         }
     }
 }
