@@ -116,7 +116,7 @@ public class DocumentService {
             throw new FileCreationException("Exception while creating and storing folder-path.");
         }
 
-        String fileName = documentType.name() + "_" + UUID.randomUUID() + "." + extension;
+        String fileName = documentType.name() + "." + extension;
         Path filePath = folderPath.resolve(fileName);
         try {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);

@@ -4,10 +4,12 @@ import com.mukesh.internCapstoneProject.dto.response.FetchInternsResponseDTO;
 import com.mukesh.internCapstoneProject.dto.response.RoadmapResponseDTO;
 import com.mukesh.internCapstoneProject.entity.InternTasks;
 import com.mukesh.internCapstoneProject.entity.Interns;
+import com.mukesh.internCapstoneProject.entity.Tasks;
 import com.mukesh.internCapstoneProject.entity.Users;
 import com.mukesh.internCapstoneProject.exception.NotFoundException;
 import com.mukesh.internCapstoneProject.repository.InternTasksRepository;
 import com.mukesh.internCapstoneProject.repository.InternsRepository;
+import com.mukesh.internCapstoneProject.repository.TasksRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class InternChatService {
     private final CommonServiceImpl commonService;
     private final InternsRepository internsRepository;
     private final InternTasksRepository internTasksRepository;
+    private final TasksRepository tasksRepository;
 
     public FetchInternsResponseDTO getProfile() {
         Users currentUser = commonService.getExistingUser();
@@ -52,6 +55,11 @@ public class InternChatService {
         log.info("This is from the roadmap response service.");
 
         return roadmapResponse;
+    }
+
+    public String fetchTaskDescriptionAsPerId(Long taskId) {
+        Tasks requestedTask = tasksRepository.findById(taskId).orElseThrow(() -> new NotFoundException("There is no task found with specified task"));
+        return requestedTask.getTaskDescription();
     }
 
     public Interns getIntern() {

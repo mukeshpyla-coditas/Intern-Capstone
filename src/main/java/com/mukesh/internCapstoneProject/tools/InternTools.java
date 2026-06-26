@@ -27,6 +27,11 @@ public class InternTools {
                 .build();
     }
 
+    @Tool(description = "This is a tool that you need to use when a user asks for the description of a particular task. If task-ID is not provided, inform politely to the user to mention task-ID in the request-message.")
+    public String fetchDescriptionOfTheTask(Long taskId) {
+        return internChatService.fetchTaskDescriptionAsPerId(taskId);
+    }
+
     @Tool(description = "Get the current date and time in the user's timezone")
     public String getCurrentDateTime() {
         return LocalDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
