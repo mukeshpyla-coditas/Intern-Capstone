@@ -4,6 +4,7 @@ import com.mukesh.internCapstoneProject.dto.request.CreateTaskRequestDTO;
 import com.mukesh.internCapstoneProject.dto.request.DocumentDisapprovalMessageRequestDTO;
 import com.mukesh.internCapstoneProject.dto.request.UpdateExistingTaskRequestDTO;
 import com.mukesh.internCapstoneProject.dto.response.CreateTaskResponseDTO;
+import com.mukesh.internCapstoneProject.dto.response.FetchApprovalDocumentsResponseDTO;
 import com.mukesh.internCapstoneProject.dto.response.FetchInternsResponseDTO;
 import com.mukesh.internCapstoneProject.entity.Documents;
 import com.mukesh.internCapstoneProject.entity.InternTasks;
@@ -133,6 +134,34 @@ public class HrService {
                 .page(page)
                 .size(size)
                 .isLastPage(internsPage.isLast())
+                .data(response)
+                .build();
+    }
+
+    public PageResponse<List<FetchApprovalDocumentsResponseDTO>> fetchAllDocumentsRequiringApproval(Integer page, Integer size, String sortBy, String sortOrder, String approvalStatus) {
+        HrApprovalStatus requestedStatus = commonService.checkHrApprovalValidityStatus(approvalStatus);
+        Sort sort = sortOrder.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Documents> documentsPage = documentsRepository.findAllByHrApprovalStatus(requestedStatus, pageable);
+        log.info("Successfully fetched the document, as per the page-request.");
+        List<FetchApprovalDocumentsResponseDTO> response = new ArrayList<>();
+        for(Documents documents : documentsPage.getContent()) {
+            Interns intern = documents.getInternId();
+            FetchApprovalDocumentsResponseDTO details = FetchApprovalDocumentsResponseDTO.builder()
+                    .internName(intern.getIntern().getFirstName() + " " + intern.getIntern().getLastName())
+                    .documentLocation(documents.getDocumentLocation())
+                    .documentType(documents.getDocumentType().name())
+                    .uploadedAt(String.valueOf(documents.getUpdatedAt()))
+                    .build();
+            response.add(details);
+        }
+
+        return PageResponse.<List<FetchApprovalDocumentsResponseDTO>>builder()
+                .totalElements(documentsPage.getTotalElements())
+                .totalPages(documentsPage.getTotalPages())
+                .page(page)
+                .size(size)
+                .isLastPage(documentsPage.isLast())
                 .data(response)
                 .build();
     }

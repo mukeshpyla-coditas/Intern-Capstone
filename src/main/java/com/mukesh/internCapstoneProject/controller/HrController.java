@@ -4,6 +4,7 @@ import com.mukesh.internCapstoneProject.dto.request.CreateTaskRequestDTO;
 import com.mukesh.internCapstoneProject.dto.request.DocumentDisapprovalMessageRequestDTO;
 import com.mukesh.internCapstoneProject.dto.request.UpdateExistingTaskRequestDTO;
 import com.mukesh.internCapstoneProject.dto.response.CreateTaskResponseDTO;
+import com.mukesh.internCapstoneProject.dto.response.FetchApprovalDocumentsResponseDTO;
 import com.mukesh.internCapstoneProject.dto.response.FetchInternsResponseDTO;
 import com.mukesh.internCapstoneProject.global.ApiResponse;
 import com.mukesh.internCapstoneProject.global.PageResponse;
@@ -99,5 +100,16 @@ public class HrController {
             @RequestParam(required = false, name = "sortOrder", defaultValue = "ASC") String sortOrder
     ) {
         return ResponseEntity.ok(hrService.fetchDetailsOfInterns(page, size, sortBy, sortOrder));
+    }
+
+    @GetMapping("/documents")
+    public ResponseEntity<PageResponse<List<FetchApprovalDocumentsResponseDTO>>> fetchAllApprovalRequiredDocuments(
+            @RequestParam(required = false, name = "page", defaultValue = "0") Integer page,
+            @RequestParam(required = false, name = "size", defaultValue = "5") Integer size,
+            @RequestParam(required = false, name = "sortBy", defaultValue = "id") String sortBy,
+            @RequestParam(required = false, name = "sortOrder", defaultValue = "ASC") String sortOrder,
+            @RequestParam(required = false, name = "approvalStatus", defaultValue = "IN_PROGRESS") String approvalStatus
+    ) {
+        return ResponseEntity.ok(hrService.fetchAllDocumentsRequiringApproval(page, size, sortBy, sortOrder, approvalStatus));
     }
 }

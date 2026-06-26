@@ -3,6 +3,7 @@ package com.mukesh.internCapstoneProject.service;
 import com.mukesh.internCapstoneProject.entity.Invitations;
 import com.mukesh.internCapstoneProject.entity.Users;
 import com.mukesh.internCapstoneProject.enums.DocumentType;
+import com.mukesh.internCapstoneProject.enums.HrApprovalStatus;
 import com.mukesh.internCapstoneProject.enums.InvitationStatus;
 import com.mukesh.internCapstoneProject.enums.TaskStatus;
 import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
@@ -70,4 +71,17 @@ public class CommonServiceImpl {
         sseEmitterService.sendNotification(title, message, userId);
     }
 
+    public HrApprovalStatus checkHrApprovalValidityStatus(String requestedStatus) {
+        boolean flag = false;
+        HrApprovalStatus response = null;
+        for(HrApprovalStatus type : HrApprovalStatus.values()) {
+            if(type.name().equalsIgnoreCase(requestedStatus)) {
+                response = type;
+                flag = true;
+                break;
+            }
+        }
+        if(!flag) throw new InvalidRequestException("Enter valid HrApprovalStatus.");
+        return response;
+    }
 }

@@ -27,7 +27,6 @@ public class SseEmitterService {
             emitter.onCompletion(() -> sseEmitterMap.remove(userId));
             emitter.onError(e -> sseEmitterMap.remove(userId));
             emitter.onTimeout(() -> sseEmitterMap.remove(userId));
-            emitter.complete();
             log.info("User with ID {} is successfully subscribed", userId);
         }
     }
