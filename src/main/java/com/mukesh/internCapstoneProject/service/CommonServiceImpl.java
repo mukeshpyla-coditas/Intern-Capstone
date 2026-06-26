@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 public class CommonServiceImpl {
     private final UsersRepository usersRepository;
     private final InvitationsRepository invitationsRepository;
+    private final SseEmitterService sseEmitterService;
 
     public Users getExistingUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -65,5 +66,8 @@ public class CommonServiceImpl {
         return response;
     }
 
+    public void sendEmitterNotification(String title, String message, Long userId) {
+        sseEmitterService.sendNotification(title, message, userId);
+    }
 
 }

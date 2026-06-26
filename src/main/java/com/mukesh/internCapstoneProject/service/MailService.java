@@ -14,6 +14,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -68,6 +69,10 @@ public class MailService {
         invitationsRepository.save(newInvitation);
         log.info("Created a new new invitation for the requested user: {}", request.receiverMail());
 
+        if(!Objects.isNull(manager)) {
+            commonServiceImpl.sendEmitterNotification("A New Intern onboard notification", "An invite mail has been sent to the intern with mail " + request.receiverMail(), manager.getId());
+            log.info("There is a notification sent to the respective manager, at the time on intern-invite");
+        }
         return mailMessage;
     }
 }

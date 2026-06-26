@@ -117,6 +117,7 @@ public class UserServiceImpl {
         return "New Manager record is successfully created.";
     }
 
+    @Transactional
     public String registerIntern(UserRegisterRequestDTO request, String inviteToken) {
         Invitations existingInvitation = commonService.checkInviteValidity(inviteToken);
         Users newIntern = createUser(request, Roles.NEW_HIRE);
