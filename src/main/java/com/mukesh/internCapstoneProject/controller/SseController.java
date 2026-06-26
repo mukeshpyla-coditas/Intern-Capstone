@@ -2,11 +2,9 @@ package com.mukesh.internCapstoneProject.controller;
 
 import com.mukesh.internCapstoneProject.service.SseEmitterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.Id;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
