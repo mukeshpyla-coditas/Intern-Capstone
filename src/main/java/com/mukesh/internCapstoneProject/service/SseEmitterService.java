@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class SseEmitterService {
     private final UsersRepository usersRepository;
-    private Map<Long, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
+    private final Map<Long, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
 
     public void subscribe(Long userId) {
         if(usersRepository.existsById(userId)) {
@@ -27,6 +27,7 @@ public class SseEmitterService {
             emitter.onCompletion(() -> sseEmitterMap.remove(userId));
             emitter.onError(e -> sseEmitterMap.remove(userId));
             emitter.onTimeout(() -> sseEmitterMap.remove(userId));
+            emitter.complete();
             log.info("User with ID {} is successfully subscribed", userId);
         }
     }

@@ -3,7 +3,6 @@ package com.mukesh.internCapstoneProject.service;
 import com.mukesh.internCapstoneProject.dto.response.ProgressResponseDTO;
 import com.mukesh.internCapstoneProject.entity.InternTasks;
 import com.mukesh.internCapstoneProject.entity.Interns;
-import com.mukesh.internCapstoneProject.entity.Tasks;
 import com.mukesh.internCapstoneProject.entity.Users;
 import com.mukesh.internCapstoneProject.enums.Roles;
 import com.mukesh.internCapstoneProject.enums.TaskStatus;
@@ -11,7 +10,6 @@ import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
 import com.mukesh.internCapstoneProject.exception.NotFoundException;
 import com.mukesh.internCapstoneProject.repository.InternTasksRepository;
 import com.mukesh.internCapstoneProject.repository.InternsRepository;
-import com.mukesh.internCapstoneProject.repository.TasksRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,13 +43,14 @@ public class ProgressService {
         List<InternTasks> listOfAssignedTasks = internTasksRepository.findAllByIntern(intern).orElseThrow(() -> new NotFoundException("No tasks were found mapped with the requested intern."));
         int totalAssignedTasksCount = listOfAssignedTasks.size();
         int countOfCompletedTasks = 0;
-        double progressPercentage;
+        double progressPercentage = 0D;
         for(InternTasks internTask : listOfAssignedTasks) {
             if(internTask.getTaskStatus().equals(TaskStatus.COMPLETED)) countOfCompletedTasks++;
         }
-        progressPercentage = ((double) totalAssignedTasksCount / countOfCompletedTasks) * 100.0;
+        if(countOfCompletedTasks != 0) progressPercentage = ((double) totalAssignedTasksCount / countOfCompletedTasks) * 100.0;
 
         return ProgressResponseDTO.builder()
+                .internId(intern.getId())
                 .progress(progressPercentage)
                 .internName(intern.getIntern().getFirstName() + " " + intern.getIntern().getLastName())
                 .message("Out of " + totalAssignedTasksCount + " tasks " + countOfCompletedTasks + " tasks are completed by the candidate.")

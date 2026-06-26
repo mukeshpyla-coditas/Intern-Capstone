@@ -7,10 +7,8 @@ public record InviteUserRequestDTO(
         @Email
         @NotBlank
         String receiverMail,
-
         @NotBlank
         String mailSubject,
-
         @NotBlank
         String mailMessage
 ) {

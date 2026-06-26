@@ -152,8 +152,7 @@ public class InternService {
     }
 
     public ProgressResponseDTO getProgress(Long internId) {
-        Interns requestedIntern = internsRepository.findById(internId).orElseThrow(() -> new NotFoundException("Intern with specified ID does not exist."));
-        return progressService.calculateProgress(requestedIntern);
+        return progressService.getProgressOfIntern(internId);
     }
 }
 

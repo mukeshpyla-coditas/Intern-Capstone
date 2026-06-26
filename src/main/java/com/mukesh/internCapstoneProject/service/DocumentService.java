@@ -9,7 +9,6 @@ import com.mukesh.internCapstoneProject.exception.DataAccessException;
 import com.mukesh.internCapstoneProject.exception.FileCreationException;
 import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
 import com.mukesh.internCapstoneProject.exception.NotFoundException;
-import com.mukesh.internCapstoneProject.repository.DocumentsRepository;
 import com.mukesh.internCapstoneProject.repository.InternsRepository;
 import com.mukesh.internCapstoneProject.repository.PolicyDocumentsRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -38,7 +38,6 @@ public class DocumentService {
     private final PolicyDocumentsRepository policyDocumentsRepository;
     private final CommonServiceImpl commonService;
     private final InternsRepository internsRepository;
-    private final DocumentsRepository documentsRepository;
 
     DocumentService(
             @Value("${file.upload-dir}")
@@ -49,15 +48,13 @@ public class DocumentService {
             String internFileUploadDir,
             PolicyDocumentsRepository policyDocumentsRepository,
             CommonServiceImpl commonService,
-            InternsRepository internsRepository,
-            DocumentsRepository documentsRepository) {
+            InternsRepository internsRepository) {
         this.hrFileUploadDir = hrFileUploadDir;
         this.policyDocumentsRepository = policyDocumentsRepository;
         this.commonService = commonService;
         this.hrFileUploadFolder = hrFileUploadFolder;
         this.internFileUploadDir = internFileUploadDir;
         this.internsRepository = internsRepository;
-        this.documentsRepository = documentsRepository;
     }
 
     public String uploadPolicyDocument(DocumentType documentType, MultipartFile file) {
@@ -77,7 +74,7 @@ public class DocumentService {
             throw new FileCreationException("Exception while creating folder-path.");
         }
 
-        String fileName = documentType.name() + "_" + UUID.randomUUID() + "." + extension;
+        String fileName = documentType.name() + "_" + LocalDateTime.now() + "_" +  UUID.randomUUID() + "." + extension;
         Path filePath = folderPath.resolve(fileName);
         try {
             Files.copy(file.getInputStream(), filePath);
@@ -99,7 +96,7 @@ public class DocumentService {
             throw new DataAccessException("Internal upload error.");
         }
 
-        return "A new policy document has been created in the path: " + folderPath.toString();
+        return "A new policy document has been created in the path: " + folderPath;
     }
 
     public String uploadDocuments(DocumentType documentType, MultipartFile file) {
