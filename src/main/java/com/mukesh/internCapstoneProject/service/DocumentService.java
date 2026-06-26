@@ -9,6 +9,7 @@ import com.mukesh.internCapstoneProject.exception.DataAccessException;
 import com.mukesh.internCapstoneProject.exception.FileCreationException;
 import com.mukesh.internCapstoneProject.exception.InvalidRequestException;
 import com.mukesh.internCapstoneProject.exception.NotFoundException;
+import com.mukesh.internCapstoneProject.repository.DocumentsRepository;
 import com.mukesh.internCapstoneProject.repository.InternsRepository;
 import com.mukesh.internCapstoneProject.repository.PolicyDocumentsRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class DocumentService {
     private final PolicyDocumentsRepository policyDocumentsRepository;
     private final CommonServiceImpl commonService;
     private final InternsRepository internsRepository;
+    private final DocumentsRepository documentsRepository;
 
     DocumentService(
             @Value("${file.upload-dir}")
@@ -47,14 +49,15 @@ public class DocumentService {
             String internFileUploadDir,
             PolicyDocumentsRepository policyDocumentsRepository,
             CommonServiceImpl commonService,
-            InternsRepository internsRepository
-    ) {
+            InternsRepository internsRepository,
+            DocumentsRepository documentsRepository) {
         this.hrFileUploadDir = hrFileUploadDir;
         this.policyDocumentsRepository = policyDocumentsRepository;
         this.commonService = commonService;
         this.hrFileUploadFolder = hrFileUploadFolder;
         this.internFileUploadDir = internFileUploadDir;
         this.internsRepository = internsRepository;
+        this.documentsRepository = documentsRepository;
     }
 
     public String uploadPolicyDocument(DocumentType documentType, MultipartFile file) {
@@ -63,7 +66,8 @@ public class DocumentService {
 
         if(file.isEmpty()) throw new InvalidRequestException("The file uploaded is empty. Please re-verify and try again.");
         String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        if(extension != null && extension.contains("pdf")) throw new InvalidRequestException("The uploaded document must be a '.pdf' file. So, re-verify and try again.");
+        System.out.println(extension);
+        if(extension != null && !extension.equalsIgnoreCase("pdf")) throw new InvalidRequestException("The uploaded document must be a '.pdf' file. So, re-verify and try again.");
 
         Path folderPath = Paths.get(hrFileUploadDir, hrFileUploadFolder);
 
@@ -76,7 +80,7 @@ public class DocumentService {
         String fileName = documentType.name() + "_" + UUID.randomUUID() + "." + extension;
         Path filePath = folderPath.resolve(fileName);
         try {
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(file.getInputStream(), filePath);
         } catch (IOException e) {
             throw new FileCreationException("Error while creating the copy of the file locally.");
         }
@@ -85,7 +89,7 @@ public class DocumentService {
                     .documentType(documentType)
                     .fileName(fileName)
                     .fileExtension(extension)
-                    .fileLocation(folderPath.toString())
+                    .fileLocation(filePath.toString())
                     .uploadedBy(existingUser)
                     .build();
             policyDocumentsRepository.save(documents);
@@ -105,7 +109,7 @@ public class DocumentService {
 
         if(file.isEmpty()) throw new InvalidRequestException("The file uploaded is empty. Please re-verify and try again.");
         String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        if(extension != null && extension.contains("pdf")) throw new InvalidRequestException("The uploaded document must be a '.pdf' file. So, re-verify and try again.");
+        if(extension != null && !extension.contains("pdf")) throw new InvalidRequestException("The uploaded document must be a '.pdf' file. So, re-verify and try again.");
 
         String folderName = "intern-" + requestedIntern.getId();
         Path folderPath = Paths.get(internFileUploadDir, folderName);

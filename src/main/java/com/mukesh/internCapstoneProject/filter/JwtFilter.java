@@ -36,12 +36,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 token = header.substring(7);
                 username = jwtUtil.extractUsername(token);
             }
-            else {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.setContentType("application/json");
-                response.getWriter().write(ExceptionMessages.BEARER_TOKEN_EXCEPTION);
-                return;
-            }
+//            else {
+//                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//                response.setContentType("application/json");
+//                response.getWriter().write(ExceptionMessages.BEARER_TOKEN_EXCEPTION);
+//                return;
+//            }
         }
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null && jwtUtil.isTokenValid(token)) {
